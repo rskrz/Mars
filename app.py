@@ -8,6 +8,8 @@ DEBUG = True
 # instantiate the app
 app = Flask(__name__)
 app.config.from_object(__name__)
+app.config['CORS_ORIGINS'] = ["localhost"]
+app.config['CORS_HEADERS'] = ["Access-Control-Allow_origin"]
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
@@ -16,4 +18,9 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 @app.route('/fetch', methods=['GET'])
 def gen():
     image_out('mars.png')
-    return jsonify('200')
+    response = jsonify('200')
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+if __name__ == '__main__':
+    app.run()

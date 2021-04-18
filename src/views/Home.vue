@@ -2,13 +2,13 @@
   #Home
     img(src="https://img.wallpapersafari.com/desktop/1920/1080/44/98/fpyhXL.jpg").absolute.z-2.bg.shadow-3
     .flex.flex-column.z-3.relative.main.center.items-center
-      .flex.flex-row-ns.flex-column.searchbar.w-50.br4.mb5.search.pa1
+      .flex.flex-row-ns.flex-column.searchbar.w-50.br4.mb5.search.pa1.shadow-3
         input(
           type="number"
           v-model="message" 
           placeholder="Search for a sol"
         ).ml2.w-90.mt2.mt0-ns.searchbar.br4.white
-        button(@click="submitSearch").br4.w-20.white Search
+        button(@click="submitSearch").br4.w-20.white.dim.mr1 Search
       .flex.flex-column.center.w-50.bg-black-90.br4.shadow-3
         p.tc LATEST WEATHER ON MARS
         h1.ma0.pa0.tc Sol {{ check(weather.sol) }}
@@ -60,12 +60,19 @@
               h2.ma0.pa1 Sol {{ day.sol }}
               h3.ma0.pa1 {{ day.min_temp }}°C / {{ day.max_temp }}°C
       .flex.flex-column.mt6.w-50
-        h1.f2.mt0.mb3.mh0 Today's Photos
-        .flex.justify-between
-          div(v-for="photo in photos")
+        h1.f2.mt0.mb4.mh0 Today's Photos
+        .flex.flex-wrap
+          div(v-for="photo in photos").w-33
             img(:src="photo.img_src").h5.w5.br4.shadow-3
+            .flex.flex-column
+              h3.white.mh0.mb0.mt2.pa0 {{ photo.rover.name }} rover
+              p.third.mh0.mb0.mt2.pa0 {{ photo.camera.full_name }}
     .w-100.absolute.z-2.bg2.mt7
-    .flex.flex-column.relative.z-3.mt7
+    .flex.justify-center.relative.z-3
+      .flex.flex-column.mt7.w-70
+        h1.tc.mb0 Where am I?
+        .flex.justify-center.mv0
+          img(src="../../mars.png").graph
 </template>
 
 <script lang="ts">
@@ -110,17 +117,17 @@ interface Photo {
   name: "Home"
 })
 export default class Home extends Vue {
-  public photos: Photo[] = [
-    {
-      camera: {},
-      earth_date: "2021-04-06",
-      rover: {},
-      img_src:
-        "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/03081/opgs/edr/fcam/FLB_671013737EDR_F0871958FHAZ00302M_.JPG",
-      id: 821489,
-      sol: 3081
-    }
-  ]
+  public photo = {
+    camera: {},
+    earth_date: "2021-04-06",
+    rover: {},
+    img_src:
+      "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/03081/opgs/edr/fcam/FLB_671013737EDR_F0871958FHAZ00302M_.JPG",
+    id: 821489,
+    sol: 3081
+  }
+  public images = ""
+  public photos: Photo[] = [this.photo, this.photo, this.photo]
   public filteredWeather: Weather[] = []
   public current = 1
   public message: null | number = null
@@ -186,6 +193,10 @@ export default class Home extends Vue {
     this.filteredWeather = this.weatherArr.slice(-6, this.weatherArr.length - 1).reverse()
     this.weather = this.weatherArr[this.weatherArr.length - 1]
     this.fetch("2021-04-06")
+    this.getImages()
+  }
+  getImages(): void {
+    axios.get("http://localhost:5000/fetch").then((res) => {})
   }
   fetch(date: string): void {
     axios
@@ -207,7 +218,7 @@ export default class Home extends Vue {
   filter: contrast(90%);
 }
 .bg2 {
-  height: 600px;
+  height: 1000px;
   width: 100%;
   object-fit: cover;
   background-color: #4d1518;
@@ -231,6 +242,7 @@ input[type="number"]:focus {
 button {
   border: none;
   background-color: #4d1518;
+  cursor: pointer;
 }
 .vl {
   border-left: 2px solid #812e33;
@@ -241,5 +253,12 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+.graph {
+  width: 800px;
+  height: 800px;
+}
+.third {
+  color: #a5a5a5;
 }
 </style>
