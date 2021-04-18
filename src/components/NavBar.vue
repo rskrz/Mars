@@ -2,7 +2,8 @@
   #NavBar.flex.justify-between.mh4.items-center
     h1 Life On Mars?
     .flex
-      a.white.f2.mh4 About
+      a.white.f2.mr4 Home
+      a.white.f2.mr4 About
       a.white.f2 Contact
 </template>
 

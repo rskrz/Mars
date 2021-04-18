@@ -3,11 +3,15 @@
     img(src="https://img.wallpapersafari.com/desktop/1920/1080/44/98/fpyhXL.jpg").absolute.z-2.bg
     .flex.flex-column.z-3.relative.main.center.items-center
       .flex.flex-row-ns.flex-column.searchbar.w-50.br4.mb5.search.pa1
-        input(v-model="message" placeholder="Search for a sol").ml2.w-90.mt2.mt0-ns.searchbar.br4.white
-        button.br4.w-20.white Search
+        input(
+          type="number"
+          v-model="message" 
+          placeholder="Search for a sol"
+        ).ml2.w-90.mt2.mt0-ns.searchbar.br4.white
+        button(@click="submitSearch").br4.w-20.white Search
       .flex.flex-column.center.w-50.bg-black-90.br4
         p.tc LATEST WEATHER ON MARS
-        h1.ma0.pa0.tc Sol {{ weather.sol }}
+        h1.ma0.pa0.tc Sol {{ check(weather.sol) }}
         h3.ma0.pa0.tc {{ weather.terrestrial_date.split("T")[0] }}
         .flex.justify-between.items-center.mh4
           .flex.items-center
@@ -50,11 +54,11 @@
                 h2.ma0.pa0 UV Index:
                 h3.ma0.pa0 {{ weather.local_uv_irradiance_index}}
               hr.w-100
-        .flex.justify-around.mb4
-          div(v-for="day in weatherArr.slice(-6, weatherArr.length - 1).reverse()")
+        .flex.flex-wrap.mb4.mh3
+          div(v-for="day in filteredWeather").w-20.pa2
             .flex.flex-column.vl
-              h2.ma0.pa2 Sol {{ day.sol }}
-              h3.ma0.pa2 {{ day.min_temp }}°C / {{ day.max_temp }}°C
+              h2.ma0.pa1 Sol {{ day.sol }}
+              h3.ma0.pa1 {{ day.min_temp }}°C / {{ day.max_temp }}°C
 </template>
 
 <script lang="ts">
@@ -89,8 +93,9 @@ interface Weather {
   name: "Home"
 })
 export default class Home extends Vue {
+  public filteredWeather: Weather[] = []
   public current = 1
-  public message = ""
+  public message: null | number = null
   public weatherJson = {
     default: []
   }
@@ -118,12 +123,22 @@ export default class Home extends Vue {
     wind_direction: null,
     wind_speed: null
   }
-  newDate(date: string): string {
-    return date.split("T")[0]
+  submitSearch(): void {
+    var sol = 3081
+    if (this.message == null) sol = 3081
+    else sol = this.message
+    const adjust = sol - 3081 - 6
+    const searchTerm = sol - 209
+    this.weather = this.weatherArr[searchTerm]
+    this.filteredWeather = this.weatherArr.slice(adjust, searchTerm).reverse()
+  }
+  check(value: number | string): string | number {
+    return !value ? "N/A" : value
   }
   mounted(): void {
     this.weatherArr = json
     this.weatherArr.sort((a, b) => a.sol - b.sol)
+    this.filteredWeather = this.weatherArr.slice(-6, this.weatherArr.length - 1).reverse()
     this.weather = this.weatherArr[this.weatherArr.length - 1]
   }
 }
@@ -145,10 +160,11 @@ export default class Home extends Vue {
 .searchbar {
   background-color: #812e33;
 }
-input {
+input[type="number"] {
   border: none;
+  -moz-appearance: textfield;
 }
-input:focus {
+input[type="number"]:focus {
   outline: none;
 }
 button {
@@ -159,5 +175,10 @@ button {
   border-left: 2px solid #812e33;
   border-right: 2px solid #812e33;
   height: 100%;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 </style>
