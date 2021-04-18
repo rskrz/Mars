@@ -1,6 +1,6 @@
 <template lang="pug">
   #Home
-    img(src="https://img.wallpapersafari.com/desktop/1920/1080/44/98/fpyhXL.jpg").absolute.z-2.bg
+    img(src="https://img.wallpapersafari.com/desktop/1920/1080/44/98/fpyhXL.jpg").absolute.z-2.bg.shadow-3
     .flex.flex-column.z-3.relative.main.center.items-center
       .flex.flex-row-ns.flex-column.searchbar.w-50.br4.mb5.search.pa1
         input(
@@ -9,7 +9,7 @@
           placeholder="Search for a sol"
         ).ml2.w-90.mt2.mt0-ns.searchbar.br4.white
         button(@click="submitSearch").br4.w-20.white Search
-      .flex.flex-column.center.w-50.bg-black-90.br4
+      .flex.flex-column.center.w-50.bg-black-90.br4.shadow-3
         p.tc LATEST WEATHER ON MARS
         h1.ma0.pa0.tc Sol {{ check(weather.sol) }}
         h3.ma0.pa0.tc {{ weather.terrestrial_date.split("T")[0] }}
@@ -59,11 +59,19 @@
             .flex.flex-column.vl
               h2.ma0.pa1 Sol {{ day.sol }}
               h3.ma0.pa1 {{ day.min_temp }}°C / {{ day.max_temp }}°C
+      .flex.flex-column.mt6.w-50
+        h1.f2.mt0.mb3.mh0 Today's Photos
+        .flex.justify-between
+          div(v-for="photo in photos")
+            img(:src="photo.img_src").h5.w5.br4.shadow-3
+    .w-100.absolute.z-2.bg2.mt7
+    .flex.flex-column.relative.z-3.mt7
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator"
 import json from "../assets/out.json"
+import axios from "axios"
 
 interface Weather {
   status: number | null
@@ -89,10 +97,30 @@ interface Weather {
   wind_speed: string | null
 }
 
+interface Photo {
+  camera: {}
+  earth_date: string
+  id: number
+  img_src: string
+  rover: object
+  sol: number
+}
+
 @Component({
   name: "Home"
 })
 export default class Home extends Vue {
+  public photos: Photo[] = [
+    {
+      camera: {},
+      earth_date: "2021-04-06",
+      rover: {},
+      img_src:
+        "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/03081/opgs/edr/fcam/FLB_671013737EDR_F0871958FHAZ00302M_.JPG",
+      id: 821489,
+      sol: 3081
+    }
+  ]
   public filteredWeather: Weather[] = []
   public current = 1
   public message: null | number = null
@@ -123,6 +151,17 @@ export default class Home extends Vue {
     wind_direction: null,
     wind_speed: null
   }
+  getRandomInt(max: number): number {
+    return Math.floor(Math.random() * max)
+  }
+  random(photos: Photo[]): Photo[] {
+    if (photos.length == 1) return photos
+    return [
+      photos[0],
+      photos[this.getRandomInt(photos.length)],
+      photos[this.getRandomInt(photos.length)]
+    ]
+  }
   submitSearch(): void {
     var sol = 3081
     if (this.message == null) sol = 3081
@@ -131,6 +170,12 @@ export default class Home extends Vue {
     const searchTerm = sol - 209
     this.weather = this.weatherArr[searchTerm]
     this.filteredWeather = this.weatherArr.slice(adjust, searchTerm).reverse()
+    if (this.weather.terrestrial_date == null) {
+      this.fetch("2021-04-06")
+    } else {
+      console.log(this.weather.terrestrial_date.split("T")[0])
+      this.fetch(this.weather.terrestrial_date.split("T")[0])
+    }
   }
   check(value: number | string): string | number {
     return !value ? "N/A" : value
@@ -140,6 +185,16 @@ export default class Home extends Vue {
     this.weatherArr.sort((a, b) => a.sol - b.sol)
     this.filteredWeather = this.weatherArr.slice(-6, this.weatherArr.length - 1).reverse()
     this.weather = this.weatherArr[this.weatherArr.length - 1]
+    this.fetch("2021-04-06")
+  }
+  fetch(date: string): void {
+    axios
+      .get(
+        `https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date=${date}&api_key=958zjnxi361gLkrtRXroHdlpVK7cNkT83bRuTEcS`
+      )
+      .then((response) => {
+        this.photos = this.random(response.data.photos)
+      })
   }
 }
 </script>
@@ -150,6 +205,12 @@ export default class Home extends Vue {
   width: 100%;
   object-fit: cover;
   filter: contrast(90%);
+}
+.bg2 {
+  height: 600px;
+  width: 100%;
+  object-fit: cover;
+  background-color: #4d1518;
 }
 .main {
   top: 120px;
