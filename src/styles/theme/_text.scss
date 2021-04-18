@@ -1,0 +1,20 @@
+h1 {
+  color: $primary-text-color; // Take the variable value and use as text color.
+  @extend .f1; // Import other SASS classes written into this SASS class.
+}
+
+h2 {
+  color: $primary-text-color;
+}
+
+h3 {
+  color: $secondary-text-color;
+}
+
+p {
+  color: $tertiary-text-color;
+}
+
+hr {
+  color: $tertiary-text-color;
+}
