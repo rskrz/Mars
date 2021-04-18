@@ -26,7 +26,7 @@ def create_plot(planetspositionsHrect):
         planetname.append(key)
         forplot.append(   planetspositionsHrect[key] )
 
-    plt.figure(figsize=(15,15))
+    plt.figure(figsize=(15,15), frameon=False)
     ax = plt.gca()
     ax.cla()
     ax.set_xlim((-33, 33))
