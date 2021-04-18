@@ -180,7 +180,6 @@ export default class Home extends Vue {
     if (this.weather.terrestrial_date == null) {
       this.fetch("2021-04-06")
     } else {
-      console.log(this.weather.terrestrial_date.split("T")[0])
       this.fetch(this.weather.terrestrial_date.split("T")[0])
     }
   }
