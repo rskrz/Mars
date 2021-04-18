@@ -70,7 +70,7 @@
     .w-100.absolute.z-2.bg2.mt7
     .flex.justify-center.relative.z-3
       .flex.flex-column.mt7.w-70
-        h1.tc.mb0 Where am I?
+        h1.tc.mb0.mt5 Where am I?
         .flex.justify-center.mv0
           img(src="../../mars.png").graph
 </template>
