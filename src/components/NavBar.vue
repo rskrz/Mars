@@ -1,6 +1,6 @@
 <template lang="pug">
   #NavBar.flex.justify-between.mh4.items-center
-    h1 Life on Mars
+    h1 Life On Mars?
     .flex
       a.white.f2.mh4 About
       a.white.f2 Contact

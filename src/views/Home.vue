@@ -4,7 +4,7 @@
     .flex.flex-column.z-3.relative.main.center.items-center
       .flex.flex-row-ns.flex-column.searchbar.w-50.br4.mb5.search.pa1
         input(v-model="message" placeholder="Search for a sol").ml2.w-90.mt2.mt0-ns.searchbar.br4.white
-        button.br4.w-10.white Search
+        button.br4.w-20.white Search
       .flex.flex-column.center.w-50.bg-black-90.br4
         p.tc LATEST WEATHER ON MARS
         h1.ma0.pa0.tc Sol {{ weather.sol }}
@@ -23,20 +23,20 @@
             .flex.flex-column.mr4
               .flex.justify-between
                 h3.ma0.pa0 Low:
-                h3.ma0.pa0 {{ weather.min_temp }} C
+                h3.ma0.pa0 {{ weather.min_temp }}°C
               .flex.justify-between
                 h3.ma0.pa0 High:
-                h3.ma0.pa0 {{ weather.max_temp }} C
+                h3.ma0.pa0 {{ weather.max_temp }}°C
               hr.w-100
           .flex.flex-column.w-50
             h2.ma0.pa0 Ground Temperature
             .flex.flex-column.mr4
               .flex.justify-between
                 h3.ma0.pa0 Low:
-                h3.ma0.pa0 {{ weather.min_gts_temp }} C
+                h3.ma0.pa0 {{ weather.min_gts_temp }}°C
               .flex.justify-between
                 h3.ma0.pa0 High:
-                h3.ma0.pa0 {{ weather.max_gts_temp }} C
+                h3.ma0.pa0 {{ weather.max_gts_temp }}°C
               hr.w-100
           .flex.flex-column.w-50
             .flex.flex-column.mr4
@@ -50,11 +50,16 @@
                 h2.ma0.pa0 UV Index:
                 h3.ma0.pa0 {{ weather.local_uv_irradiance_index}}
               hr.w-100
+        .flex.justify-around.mb4
+          div(v-for="day in weatherArr.slice(-6, weatherArr.length - 1).reverse()")
+            .flex.flex-column.vl
+              h2.ma0.pa2 Sol {{ day.sol }}
+              h3.ma0.pa2 {{ day.min_temp }}°C / {{ day.max_temp }}°C
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator"
-import * as json from "../assets/out.json"
+import json from "../assets/out.json"
 
 interface Weather {
   status: number | null
@@ -72,7 +77,7 @@ interface Weather {
   local_uv_irradiance_index: string | null
   min_gts_temp: number | null
   max_gts_temp: number | null
-  sol: number | null
+  sol: number
   unitOfMeasure: string | null
   TZ_Data: string | null
   abs_humidity: string | null
@@ -84,7 +89,11 @@ interface Weather {
   name: "Home"
 })
 export default class Home extends Vue {
+  public current = 1
   public message = ""
+  public weatherJson = {
+    default: []
+  }
   public weatherArr: Weather[] = []
   public weather: Weather = {
     status: 200,
@@ -114,20 +123,21 @@ export default class Home extends Vue {
   }
   mounted(): void {
     this.weatherArr = json
-    this.weather = json[2871]
+    this.weatherArr.sort((a, b) => a.sol - b.sol)
+    this.weather = this.weatherArr[this.weatherArr.length - 1]
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .bg {
-  height: 500px;
+  height: 600px;
   width: 100%;
   object-fit: cover;
   filter: contrast(90%);
 }
 .main {
-  top: 150px;
+  top: 120px;
 }
 .search {
   height: 40px;
@@ -144,5 +154,10 @@ input:focus {
 button {
   border: none;
   background-color: #4d1518;
+}
+.vl {
+  border-left: 2px solid #812e33;
+  border-right: 2px solid #812e33;
+  height: 100%;
 }
 </style>
